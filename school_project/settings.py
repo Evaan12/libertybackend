@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "corsheaders",
     "domain.apps.DomainConfig",
+    "domain",
     "school_project"
 ]
 
