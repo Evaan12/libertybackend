@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "domain.apps.DomainConfig",
     "domain",
     "school_project"
+    "rest_framework"
 ]
 
 MIDDLEWARE = [
