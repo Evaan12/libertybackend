@@ -37,8 +37,9 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "corsheaders"
-    "core"
+    "corsheaders",
+    "domain.apps.DomainConfig",
+    "school_project"
 ]
 
 MIDDLEWARE = [
@@ -76,9 +77,13 @@ WSGI_APPLICATION = "school_project.wsgi.application"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'libertyschooldb',      # Replace with your database name
+        'USER': 'postgres',       # Replace with your username
+        'PASSWORD': 'darkrai',        # Replace with your password
+        'HOST': 'localhost',                # Or the IP address of your database server
+        'PORT': '5432',                     # The default port for PostgreSQL
     }
 }
 
@@ -128,6 +133,6 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173", # The default for Vite
     "http://localhost:8000", # The default for Vite
     "http://localhost:8080",
-    "http://192.168.1.64:8080/", # The default for Vite
+    "http://192.168.1.64:8080", # The default for Vite
     "http://127.0.0.1:5173",
 ]
