@@ -130,3 +130,13 @@ CORS_ALLOWED_ORIGINS = [
     "http://192.168.1.64:8080", # The default for Vite
     "http://127.0.0.1:5173",
 ]
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",  # Assumes Redis is running on localhost, port 6379
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
