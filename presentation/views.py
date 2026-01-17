@@ -4,24 +4,27 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.core.cache import cache
 from infrastructure.repositories.about_repository import AboutRepository
-from .serializers import MissionSerializer, VisionSerializer, CoreValueSerializer, MilestoneSerializer
-import time # Import time for a timestamp
+# Import new academics repository and serializers
+from infrastructure.repositories.academics_repository import AcademicsRepository
+from .serializers import (
+    MissionSerializer, VisionSerializer, CoreValueSerializer, MilestoneSerializer,
+    CurriculumPhilosophySerializer, CurriculumPillarSerializer, SubjectSerializer, GradeLevelSerializer
+)
+import time
 
+# --- Existing About Page API View ---
 class AboutPageAPIView(APIView):
+    # ... (no changes here) ...
     def get(self, request, *args, **kwargs):
         cache_key = 'about_page_data'
         
-        print(f"\n[{time.ctime()}] --- VIEW HIT: Attempting to get cache for key: '{cache_key}' ---")
-        
-        # 1. Try to get data from cache first
         cached_data = cache.get(cache_key)
         
         if cached_data:
-            print(f"[{time.ctime()}] >>> CACHE HIT! Returning cached data.")
+            print(f"[{time.ctime()}] CACHE HIT! Returning cached data for About Page.")
             return Response(cached_data)
 
-        # 2. If not in cache, fetch from DB
-        print(f"[{time.ctime()}] --- CACHE MISS! Fetching data from database... ---")
+        print(f"[{time.ctime()}] --- CACHE MISS! Fetching About Page data from database... ---")
         repository = AboutRepository()
         
         mission = repository.get_mission()
@@ -41,8 +44,38 @@ class AboutPageAPIView(APIView):
             'milestones': milestones_data,
         }
 
-        # 3. Store the response data in the cache
-        print(f"[{time.ctime()}] <<< Storing new data in cache. Timeout: 7200 seconds.")
+        print(f"[{time.ctime()}] <<< Storing new About Page data in cache. Timeout: 7200 seconds.")
+        cache.set(cache_key, response_data, timeout=7200)
+
+        return Response(response_data)
+
+
+# --- New Academics Page API View ---
+class AcademicsPageAPIView(APIView):
+    def get(self, request, *args, **kwargs):
+        cache_key = 'academics_page_data'
+        
+        cached_data = cache.get(cache_key)
+        if cached_data:
+            print(f"[{time.ctime()}] CACHE HIT! Returning cached data for Academics Page.")
+            return Response(cached_data)
+        
+        print(f"[{time.ctime()}] --- CACHE MISS! Fetching Academics Page data from database... ---")
+        repository = AcademicsRepository()
+
+        philosophy = repository.get_philosophy()
+        pillars = repository.get_all_pillars()
+        subjects = repository.get_all_subjects()
+        grade_levels = repository.get_all_grade_levels()
+
+        response_data = {
+            'philosophy': CurriculumPhilosophySerializer(philosophy).data if philosophy else {},
+            'pillars': CurriculumPillarSerializer(pillars, many=True).data,
+            'subjects': SubjectSerializer(subjects, many=True).data,
+            'grade_levels': GradeLevelSerializer(grade_levels, many=True).data
+        }
+
+        print(f"[{time.ctime()}] <<< Storing new Academics Page data in cache. Timeout: 7200 seconds.")
         cache.set(cache_key, response_data, timeout=7200)
 
         return Response(response_data)
