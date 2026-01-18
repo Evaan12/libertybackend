@@ -1,5 +1,6 @@
 from .about import Mission, Vision, CoreValue, Milestone
 from .academics import CurriculumPhilosophy, CurriculumPillar, GradeLevel, Subject
+from .facilities import Facility
 
 __all__ = [
     'Mission',
@@ -10,4 +11,5 @@ __all__ = [
     'CurriculumPillar',
     'Subject',
     'GradeLevel',
+    'Facility',
 ]

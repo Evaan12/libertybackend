@@ -1,7 +1,10 @@
+# presentation/serializers.py
+
 from rest_framework import serializers
 from domain.models.about import Mission, Vision, CoreValue, Milestone
-# Import the new academics models
 from domain.models.academics import CurriculumPhilosophy, CurriculumPillar, Subject, GradeLevel
+# Import the new Facility model
+from domain.models.facilities import Facility
 
 # --- Existing About Serializers ---
 class MissionSerializer(serializers.ModelSerializer):
@@ -25,7 +28,6 @@ class MilestoneSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 # --- New Academics Serializers ---
-
 class CurriculumPhilosophySerializer(serializers.ModelSerializer):
     class Meta:
         model = CurriculumPhilosophy
@@ -42,13 +44,23 @@ class SubjectSerializer(serializers.ModelSerializer):
         fields = ['name', 'description', 'icon']
 
 class GradeLevelSerializer(serializers.ModelSerializer):
-    # Create a custom field to split the comma-separated subjects into a list
     subjects = serializers.SerializerMethodField()
-
     class Meta:
         model = GradeLevel
         fields = ['level', 'focus', 'description', 'subjects']
-
     def get_subjects(self, obj):
-        # Split the string by comma and strip whitespace from each subject
         return [subject.strip() for subject in obj.subjects_offered.split(',')]
+
+# --- New Facilities Serializer ---
+class FacilitySerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Facility
+        fields = ['id', 'title', 'description', 'image', 'icon']
+    
+    def get_image(self, obj):
+        request = self.context.get('request')
+        if obj.image and hasattr(obj.image, 'url'):
+            return request.build_absolute_uri(obj.image.url)
+        return None

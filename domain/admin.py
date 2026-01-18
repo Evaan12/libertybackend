@@ -1,7 +1,10 @@
+# domain/admin.py
+
 from django.contrib import admin
 from .models.about import Mission, Vision, CoreValue, Milestone
-# Import the new academics models
 from .models.academics import CurriculumPhilosophy, CurriculumPillar, Subject, GradeLevel
+# Import the new Facility model
+from .models.facilities import Facility
 
 # --- Existing About Section Admin ---
 @admin.register(Mission)
@@ -35,7 +38,6 @@ class CurriculumPhilosophyAdmin(admin.ModelAdmin):
     list_display = ('title', 'description')
 
     def has_add_permission(self, request):
-        # Allow only one instance of the philosophy
         return not CurriculumPhilosophy.objects.exists()
 
 @admin.register(CurriculumPillar)
@@ -52,3 +54,9 @@ class SubjectAdmin(admin.ModelAdmin):
 class GradeLevelAdmin(admin.ModelAdmin):
     list_display = ('level', 'focus')
     ordering = ('id',)
+
+# --- New Facilities Section Admin ---
+@admin.register(Facility)
+class FacilityAdmin(admin.ModelAdmin):
+    list_display = ('title', 'icon', 'description')
+    search_fields = ('title', 'description')

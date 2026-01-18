@@ -4,18 +4,20 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.core.cache import cache
 from infrastructure.repositories.about_repository import AboutRepository
-# Import new academics repository and serializers
 from infrastructure.repositories.academics_repository import AcademicsRepository
+# Import new Facilities repository and serializer
+from infrastructure.repositories.facilities_repository import FacilitiesRepository
 from .serializers import (
     MissionSerializer, VisionSerializer, CoreValueSerializer, MilestoneSerializer,
-    CurriculumPhilosophySerializer, CurriculumPillarSerializer, SubjectSerializer, GradeLevelSerializer
+    CurriculumPhilosophySerializer, CurriculumPillarSerializer, SubjectSerializer, GradeLevelSerializer,
+    FacilitySerializer  # Import new serializer
 )
 import time
 
 # --- Existing About Page API View ---
 class AboutPageAPIView(APIView):
-    # ... (no changes here) ...
     def get(self, request, *args, **kwargs):
+        # ... (no changes here) ...
         cache_key = 'about_page_data'
         
         cached_data = cache.get(cache_key)
@@ -50,9 +52,10 @@ class AboutPageAPIView(APIView):
         return Response(response_data)
 
 
-# --- New Academics Page API View ---
+# --- Existing Academics Page API View ---
 class AcademicsPageAPIView(APIView):
     def get(self, request, *args, **kwargs):
+        # ... (no changes here) ...
         cache_key = 'academics_page_data'
         
         cached_data = cache.get(cache_key)
@@ -76,6 +79,31 @@ class AcademicsPageAPIView(APIView):
         }
 
         print(f"[{time.ctime()}] <<< Storing new Academics Page data in cache. Timeout: 7200 seconds.")
+        cache.set(cache_key, response_data, timeout=7200)
+
+        return Response(response_data)
+
+
+# --- New Facilities Page API View ---
+class FacilitiesPageAPIView(APIView):
+    def get(self, request, *args, **kwargs):
+        cache_key = 'facilities_page_data'
+        
+        cached_data = cache.get(cache_key)
+        if cached_data:
+            print(f"[{time.ctime()}] CACHE HIT! Returning cached data for Facilities Page.")
+            return Response(cached_data)
+        
+        print(f"[{time.ctime()}] --- CACHE MISS! Fetching Facilities Page data from database... ---")
+        repository = FacilitiesRepository()
+
+        facilities = repository.get_all_facilities()
+        # Pass context to the serializer to build full image URL
+        serializer = FacilitySerializer(facilities, many=True, context={'request': request})
+        
+        response_data = serializer.data
+
+        print(f"[{time.ctime()}] <<< Storing new Facilities Page data in cache. Timeout: 7200 seconds.")
         cache.set(cache_key, response_data, timeout=7200)
 
         return Response(response_data)

@@ -1,1 +1,2 @@
 from .about_repository import AboutRepository
+from .academics_repository import AcademicsRepository
